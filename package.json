@@ -7,8 +7,7 @@
     "private": true,
     "scripts": {
         "dev": "vite",
-        "build": "tsc && vite build && electron-builder",
-        "build:electron": "tsc && electron-builder",
+        "build": "tsc --noEmit && vite build && electron-builder",
         "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
         "preview": "vite preview",
         "format": "prettier --write 'src/**/*.{ts,js,json,css,html}'"
@@ -21,13 +20,14 @@
     "devDependencies": {
         "@tsconfig/node22": "^22.0.2",
         "@types/node": "^24.1.0",
+        "@types/three": "^0.178.1",
         "@typescript-eslint/eslint-plugin": "^8.38.0",
         "@typescript-eslint/parser": "^8.38.0",
+        "electron": "^37.2.4",
         "electron-builder": "26.0.12",
         "eslint": "^9.31.0",
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-prettier": "^5.5.3",
-        "electron": "^37.2.4",
         "prettier": "^3.6.2",
         "ts-node": "^10.9.2",
         "typescript": "^5.8.3",

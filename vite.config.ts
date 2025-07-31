@@ -1,4 +1,4 @@
-import path from 'node:path';
+import { builtinModules } from 'module';
 import { defineConfig } from 'vite';
 import electron from 'vite-plugin-electron';
 
@@ -6,27 +6,29 @@ export default defineConfig({
     plugins: [
         electron([
             {
-                // Main process
-                entry: 'electron/main.ts',
+                entry: 'electron/main.ts', // ESM으로 번들됨
                 vite: {
                     build: {
-                        outDir: 'dist-electron/main',
-                    },
-                },
+                        outDir: 'dist-electron/main'
+                    }
+                }
             },
             {
-                // Preload script
-                entry: path.join(__dirname, 'electron/preload.ts'),
                 vite: {
                     build: {
                         outDir: 'dist-electron/preload',
+                        lib: {
+                            entry: 'electron/preload.ts',
+                            formats: ['cjs'], // ⭐️ CJS로만 번들링
+                            fileName: () => 'preload.js',
+                        },
+                        rollupOptions: {
+                            external: [...builtinModules],
+                        },
+                        emptyOutDir: false,
                     },
                 },
-            }
-        ])
+            },
+        ]),
     ],
-    resolve: {
-        alias: [{ find: "@", replacement: "/src" }],
-    },
-    base: '/',
 });

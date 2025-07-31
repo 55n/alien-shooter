@@ -20,10 +20,13 @@ let win: BrowserWindow | null
 
 function createWindow() {
     win = new BrowserWindow({
+        // fullscreen: true,
+        // resizable: false,
         icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
         webPreferences: {
             preload: path.join(PRELOAD_DIST, 'preload.js'),
         },
+        autoHideMenuBar: true, // ⬅️ 메뉴 자동 숨김
     })
 
     // Test active push message to Renderer-process.
@@ -33,7 +36,7 @@ function createWindow() {
 
     if (VITE_DEV_SERVER_URL) {
         win.loadURL(VITE_DEV_SERVER_URL)
-        win.webContents.openDevTools();
+        // win.webContents.openDevTools();
     } else {
         win.loadFile(path.join(RENDERER_DIST, 'index.html'))
     }
