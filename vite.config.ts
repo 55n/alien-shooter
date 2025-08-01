@@ -1,3 +1,4 @@
+import react from '@vitejs/plugin-react';
 import { builtinModules } from 'module';
 import { defineConfig } from 'vite';
 import electron from 'vite-plugin-electron';
@@ -30,5 +31,9 @@ export default defineConfig({
                 },
             },
         ]),
+        react()
     ],
+    resolve: {
+        alias: [{ find: "@", replacement: "/src" }],
+    },
 });
