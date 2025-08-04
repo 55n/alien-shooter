@@ -1067,6 +1067,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@pmndrs/cannon-worker-api@npm:^2.4.0":
+  version: 2.4.0
+  resolution: "@pmndrs/cannon-worker-api@npm:2.4.0"
+  peerDependencies:
+    three: ">=0.139"
+  checksum: 10c0/9f79dcf2fec74798bf67523f0cb93a435e6a1771ea449e8dfaac0ccfce0a533a01551cc3578d0b62613adb634dfffaa7fd0daf17d465c665dfff3d36cf95bb33
+  languageName: node
+  linkType: hard
+
+"@react-three/cannon@npm:^6.6.0":
+  version: 6.6.0
+  resolution: "@react-three/cannon@npm:6.6.0"
+  dependencies:
+    "@pmndrs/cannon-worker-api": "npm:^2.4.0"
+    cannon-es: "npm:^0.20.0"
+    cannon-es-debugger: "npm:^1.0.0"
+  peerDependencies:
+    "@react-three/fiber": ">=8"
+    react: ">=18"
+    three: ">=0.139"
+  checksum: 10c0/ccab2f94ae54aca3cf44d9ad00db5e63a02d85a978bded8684d374e1bc68b8c810b6d5736ada1e4238b92b342835f76599801f2820547258d8c6f6f57fc98153
+  languageName: node
+  linkType: hard
+
 "@react-three/drei@npm:^10.6.1":
   version: 10.6.1
   resolution: "@react-three/drei@npm:10.6.1"
@@ -2270,6 +2294,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cannon-es-debugger@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "cannon-es-debugger@npm:1.0.0"
+  peerDependencies:
+    cannon-es: 0.x
+    three: 0.x
+    typescript: ">=3.8"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 10c0/ca60ff3c76a1b331932d0c11829cc43ce3f1106e72d10ec70b3664ccce7d8b7d7fa850fd2f423191b8b10599678b21ee8b94580808c065cf9b6ecb1299d9688a
+  languageName: node
+  linkType: hard
+
 "cannon-es@npm:^0.20.0":
   version: 0.20.0
   resolution: "cannon-es@npm:0.20.0"
@@ -2427,6 +2465,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "competition@workspace:."
   dependencies:
+    "@react-three/cannon": "npm:^6.6.0"
     "@react-three/drei": "npm:^10.6.1"
     "@react-three/fiber": "npm:^9.3.0"
     "@tsconfig/node22": "npm:^22.0.2"
