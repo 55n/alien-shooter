@@ -10,7 +10,9 @@ function DebugPanel() {
         cameraDirection,
         velocity,
         isGrounded,
-        frameRate
+        frameRate,
+        canJump,
+        groundDistance
     } = useDebugStore();
     
     const { mode } = useCameraStore();
@@ -113,12 +115,22 @@ function DebugPanel() {
                 <div>Grounded: <span style={{ color: isGrounded ? '#00ff00' : '#ff6666' }}>
                     {isGrounded ? 'Yes' : 'No'}
                 </span></div>
+                <div>Can Jump: <span style={{ color: canJump ? '#00ff00' : '#ff6666' }}>
+                    {canJump ? 'Yes' : 'No'}
+                </span></div>
                 {velocity && (
-                    <div>Y-Vel: {velocity.y.toFixed(3)} (Raycast Detection)</div>
+                    <div>Y-Vel: {velocity.y.toFixed(3)}</div>
                 )}
+                {playerPosition && (
+                    <div>Height: {playerPosition.y.toFixed(3)}</div>
+                )}
+                <div>Ground Dist: {groundDistance === Infinity ? 'No Ground' : groundDistance.toFixed(3)} (Max: 1.3)</div>
                 {frameRate > 0 && (
                     <div>FPS: {frameRate.toFixed(0)}</div>
                 )}
+                <div style={{ fontSize: '10px', color: '#888', marginTop: '4px' }}>
+                    Press SPACE to jump • Ground detection: Raycast
+                </div>
             </div>
         </div>
     );

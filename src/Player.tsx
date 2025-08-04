@@ -1,11 +1,11 @@
-import { useRef, useEffect, forwardRef } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
-import { useBox } from '@react-three/cannon';
-import { Object3D, Vector3 } from 'three';
 import type { Triplet } from '@react-three/cannon';
-import { usePlayerStore } from './stores/playerStore';
+import { useBox } from '@react-three/cannon';
+import { useFrame, useThree } from '@react-three/fiber';
+import { forwardRef, useEffect, useRef } from 'react';
+import { Object3D, Raycaster, Vector3 } from 'three';
 import { useCameraStore } from './stores/cameraStore';
 import { useDebugStore } from './stores/debugStore';
+import { usePlayerStore } from './stores/playerStore';
 
 interface PlayerProps {
     position?: [number, number, number];
@@ -15,12 +15,12 @@ interface PlayerProps {
 }
 
 const Player = forwardRef<Object3D, PlayerProps>(({
-    position = [0, 2, 0],
+    position = [0, 0.8, 0],
     size = [0.6, 1.8, 0.3], // domino proportions: wider than deep, tall
     mass = 1,
     color = '#ffffff' // white like a domino
 }, ref) => {
-    const { camera } = useThree();
+    const { camera, scene } = useThree();
     
     // Zustand stores
     const { 
@@ -33,26 +33,26 @@ const Player = forwardRef<Object3D, PlayerProps>(({
     } = usePlayerStore();
     
     const { direction, rotation } = useCameraStore();
-    const { setPlayerPosition, setVelocity, setIsGrounded: setDebugIsGrounded } = useDebugStore();
+    const { setPlayerPosition, setVelocity, setIsGrounded: setDebugIsGrounded, setCanJump: setDebugCanJump, setGroundDistance } = useDebugStore();
 
     // Local component state only
     const canJumpRef = useRef(false);
     const velocityRef = useRef<Triplet>([0, 0, 0]);
     const debugUpdateCounter = useRef(0);
     const visualGroupRef = useRef<Object3D>(null);
+    const groundRaycaster = useRef(new Raycaster());
     
     const [meshRef, api] = useBox(() => ({
         mass,
         position,
         args: size,
         material: {
-            friction: 0.4,
-            restitution: 0.1
+            friction: 0.6, // Balanced for good control without excessive drag
+            restitution: 0.01 // Minimal bounciness
         },
-        fixedRotation: true, // prevent box from tipping over
-        angularFactor: [0, 1, 0], // only allow Y-axis rotation
-        angularDamping: 0.9,
-        linearDamping: 0.1
+        angularFactor: [0, 0, 0], // Prevent all rotation (more precise than fixedRotation)
+        linearDamping: 0.02, // Very low damping for responsive movement
+        angularDamping: 0.95
     }));
 
     const tempForward = useRef(new Vector3());
@@ -65,9 +65,16 @@ const Player = forwardRef<Object3D, PlayerProps>(({
             setKey(event.code.toLowerCase(), true);
             
             if (event.code === 'Space' && canJumpRef.current) {
-                api.velocity.set(0, 6, 0);
+                console.log('JUMP! Current velocity:', velocityRef.current, 'Position:', meshRef.current?.position);
+                // Preserve horizontal velocity when jumping
+                api.velocity.set(
+                    velocityRef.current[0],
+                    8,
+                    velocityRef.current[2]
+                );
                 canJumpRef.current = false;
                 setIsGrounded(false);
+                setDebugCanJump(false);
             }
         };
 
@@ -99,20 +106,79 @@ const Player = forwardRef<Object3D, PlayerProps>(({
             }
         });
 
-        // Simple ground detection - allow jumping when velocity is low
+        // Raycast-based ground detection
         const checkGrounded = () => {
-            const isGrounded = Math.abs(velocityRef.current[1]) < 0.1;
+            if (!meshRef.current) return;
+            
+            const position = meshRef.current.position;
+            const verticalVelocity = velocityRef.current[1];
+            
+            // Set up raycast from player position downward
+            const rayOrigin = new Vector3(position.x, position.y, position.z);
+            const rayDirection = new Vector3(0, -1, 0); // Straight down
+            
+            groundRaycaster.current.set(rayOrigin, rayDirection);
+            
+            // Cast ray and check for intersections
+            const intersects = groundRaycaster.current.intersectObjects(scene.children, true);
+            
+            // Filter out the player itself from intersections
+            const groundIntersects = intersects.filter(intersect => {
+                // Skip if the intersected object is part of the player
+                let obj = intersect.object;
+                while (obj.parent) {
+                    if (obj === meshRef.current || obj.parent === meshRef.current) {
+                        return false;
+                    }
+                    obj = obj.parent;
+                }
+                return true;
+            });
+            
+            let isGrounded = false;
+            let groundDistance = Infinity;
+            
+            if (groundIntersects.length > 0) {
+                groundDistance = groundIntersects[0].distance;
+                
+                // Player is grounded if there's ground within a very generous distance
+                // Player height is 1.8, so center to bottom is 0.9
+                // Very increased tolerance to prevent bouncing on uneven surfaces
+                const maxGroundDistance = 1.3; // Very generous detection range
+                const isNotRisingFast = verticalVelocity <= 1.5; // Very permissive velocity check
+                
+                isGrounded = groundDistance <= maxGroundDistance && isNotRisingFast;
+            }
+            
+            // Debug logging
+            const wasGrounded = canJumpRef.current;
+            if (isGrounded !== wasGrounded) {
+                console.log('Ground state changed (raycast):', {
+                    isGrounded,
+                    groundDistance: groundDistance.toFixed(3),
+                    maxDistance: 1.3,
+                    verticalVelocity: verticalVelocity.toFixed(3),
+                    intersectCount: groundIntersects.length,
+                    playerY: position.y.toFixed(3)
+                });
+            }
+            
+            // Update debug info
+            setGroundDistance(groundDistance);
+            
             if (isGrounded) {
                 canJumpRef.current = true;
                 setIsGrounded(true);
                 setDebugIsGrounded(true);
+                setDebugCanJump(true);
             } else {
                 setIsGrounded(false);
                 setDebugIsGrounded(false);
+                setDebugCanJump(false);
             }
         };
         
-        const interval = setInterval(checkGrounded, 100);
+        const interval = setInterval(checkGrounded, 50); // Check more frequently
 
         return () => {
             unsubscribeVelocity();

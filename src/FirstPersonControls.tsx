@@ -54,7 +54,7 @@ function FirstPersonControls() {
         if (!enabled || !playerPosition) return;
 
         // Position camera at player position with height offset for domino
-        const eyeHeight = 1.5; // Adjusted for domino height (1.8m tall)
+        const eyeHeight = 1.4; // Adjusted for lowered player position (0.7 center)
         const cameraPosition = new Vector3(
             playerPosition.x,
             playerPosition.y + eyeHeight,

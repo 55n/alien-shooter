@@ -23,6 +23,12 @@ interface DebugState {
 
     frameRate: number;
     setFrameRate: (fps: number) => void;
+
+    canJump: boolean;
+    setCanJump: (canJump: boolean) => void;
+
+    groundDistance: number;
+    setGroundDistance: (distance: number) => void;
 }
 
 export const useDebugStore = create<DebugState>((set, get) => ({
@@ -47,4 +53,10 @@ export const useDebugStore = create<DebugState>((set, get) => ({
 
     frameRate: 0,
     setFrameRate: (fps) => set({ frameRate: fps }),
+
+    canJump: false,
+    setCanJump: (canJump) => set({ canJump }),
+
+    groundDistance: Infinity,
+    setGroundDistance: (distance) => set({ groundDistance: distance }),
 }));

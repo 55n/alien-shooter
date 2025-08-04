@@ -18,7 +18,7 @@ interface PlayerState {
     // Movement controls
     keys: Record<string, boolean>;
     setKey: (key: string, pressed: boolean) => void;
-    
+
     // Player settings
     speed: number;
     setSpeed: (speed: number) => void;
@@ -39,11 +39,12 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
     // Movement controls
     keys: {},
-    setKey: (key, pressed) => set((state) => ({
-        keys: { ...state.keys, [key]: pressed }
-    })),
+    setKey: (key, pressed) =>
+        set((state) => ({
+            keys: { ...state.keys, [key]: pressed },
+        })),
 
     // Player settings
-    speed: 10,
+    speed: 8,
     setSpeed: (speed) => set({ speed }),
 }));
