@@ -12,7 +12,9 @@ function DebugPanel() {
         isGrounded,
         frameRate,
         canJump,
-        groundDistance
+        groundDistance,
+        showPhysicsDebugger,
+        setShowPhysicsDebugger
     } = useDebugStore();
     
     const { mode } = useCameraStore();
@@ -130,6 +132,21 @@ function DebugPanel() {
                 )}
                 <div style={{ fontSize: '10px', color: '#888', marginTop: '4px' }}>
                     Press SPACE to jump • Ground detection: Raycast
+                </div>
+                
+                {/* Physics Debugger Toggle */}
+                <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #444' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', fontSize: '12px' }}>
+                        <input 
+                            type="checkbox" 
+                            checked={showPhysicsDebugger}
+                            onChange={(e) => setShowPhysicsDebugger(e.target.checked)}
+                            style={{ marginRight: '6px' }}
+                        />
+                        <span style={{ color: showPhysicsDebugger ? '#00ff00' : '#888' }}>
+                            Physics Debug (Ctrl+P)
+                        </span>
+                    </label>
                 </div>
             </div>
         </div>

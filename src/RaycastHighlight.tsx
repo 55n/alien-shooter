@@ -32,14 +32,14 @@ function RaycastHighlight() {
         setObjectDistance(Infinity);
         setIsInRange(false);
 
-        // Find the first intersected mesh (excluding the player)
+        // Find the first interactable mesh (excluding the player and non-interactable objects)
         for (const intersect of intersects) {
             const object = intersect.object;
             
-            // Skip if it's not a mesh or if it's the player (check for domino characteristics)
+            // Skip if it's not a mesh
             if (!(object instanceof Mesh)) continue;
             
-            // Skip player mesh by checking for domino-like proportions or parent structure
+            // Skip player mesh by checking for domino-like proportions
             const geometry = object.geometry;
             if (geometry && geometry.type === 'BoxGeometry') {
                 const box = geometry.parameters;
@@ -47,6 +47,12 @@ function RaycastHighlight() {
                 if (box && Math.abs(box.width - 0.6) < 0.1 && Math.abs(box.height - 1.8) < 0.1) {
                     continue;
                 }
+            }
+            
+            // Check if object is marked as interactable
+            const isInteractable = object.userData?.interactable !== false;
+            if (!isInteractable) {
+                continue; // Skip non-interactable objects like walls, floors, stairs
             }
 
             // Store original material and apply highlight
@@ -85,6 +91,11 @@ function RaycastHighlight() {
             // Determine object name based on properties or position
             let objectName = 'Object';
             
+            // Check for custom object name first
+            if (object.userData && object.userData.name) {
+                objectName = object.userData.name;
+            }
+            
             // Check if this is an NPC by looking at the object hierarchy
             let currentObj: any = object;
             let isNPC = false;
@@ -98,22 +109,24 @@ function RaycastHighlight() {
                 }
             }
             
-            // If not an NPC, check for box types
-            if (!isNPC && geometry && geometry.type === 'BoxGeometry') {
+            // If not an NPC and no custom name, check for box types
+            if (!isNPC && !object.userData?.name && geometry && geometry.type === 'BoxGeometry') {
                 const box = geometry.parameters;
                 if (box) {
                     const size = Math.max(box.width, box.height, box.depth);
-                    // Check if it's an NPC collision box (around 0.8x2x0.8)
-                    if (Math.abs(box.width - 0.8) < 0.1 && Math.abs(box.height - 2) < 0.1) {
+                    // Check object type from userData first
+                    if (object.userData?.type === 'obstacle') {
+                        if (size > 10) {
+                            objectName = 'Large Container';
+                        } else if (size > 2) {
+                            objectName = 'Storage Box';
+                        } else {
+                            objectName = 'Small Crate';
+                        }
+                    } else if (Math.abs(box.width - 0.8) < 0.1 && Math.abs(box.height - 2) < 0.1) {
                         // This is likely an NPC collision box, try to find the NPC name
                         objectName = 'NPC';
                         isNPC = true;
-                    } else if (size > 10) {
-                        objectName = 'Large Container';
-                    } else if (size > 2) {
-                        objectName = 'Storage Box';
-                    } else {
-                        objectName = 'Small Crate';
                     }
                 }
             }

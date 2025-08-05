@@ -1,7 +1,7 @@
 import type { Triplet } from '@react-three/cannon';
 import { useBox } from '@react-three/cannon';
 import { useFrame, useThree } from '@react-three/fiber';
-import { forwardRef, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Object3D, Raycaster, Vector3 } from 'three';
 import { useCameraStore } from './stores/cameraStore';
 import { useDebugStore } from './stores/debugStore';
@@ -14,13 +14,14 @@ interface PlayerProps {
     color?: string;
 }
 
-const Player = forwardRef<Object3D, PlayerProps>(({
+const Player = (({
     position = [0, 0.8, 0],
     size = [0.6, 1.8, 0.3], // domino proportions: wider than deep, tall
     mass = 1,
     color = '#ffffff' // white like a domino
-}, ref) => {
+}: PlayerProps, ref: Object3D) => {
     const { camera, scene } = useThree();
+    const { direction, rotation } = useCameraStore();
     
     // Zustand stores
     const { 
@@ -32,8 +33,13 @@ const Player = forwardRef<Object3D, PlayerProps>(({
         setIsGrounded 
     } = usePlayerStore();
     
-    const { direction, rotation } = useCameraStore();
-    const { setPlayerPosition, setVelocity, setIsGrounded: setDebugIsGrounded, setCanJump: setDebugCanJump, setGroundDistance } = useDebugStore();
+    const { 
+        setPlayerPosition, 
+        setVelocity, 
+        setIsGrounded: setDebugIsGrounded, 
+        setCanJump: setDebugCanJump, 
+        setGroundDistance 
+    } = useDebugStore();
 
     // Local component state only
     const canJumpRef = useRef(false);
@@ -41,6 +47,7 @@ const Player = forwardRef<Object3D, PlayerProps>(({
     const debugUpdateCounter = useRef(0);
     const visualGroupRef = useRef<Object3D>(null);
     const groundRaycaster = useRef(new Raycaster());
+    const velocityCleanupCounter = useRef(0);
     
     const [meshRef, api] = useBox(() => ({
         mass,
@@ -51,7 +58,7 @@ const Player = forwardRef<Object3D, PlayerProps>(({
             restitution: 0.01 // Minimal bounciness
         },
         angularFactor: [0, 0, 0], // Prevent all rotation (more precise than fixedRotation)
-        linearDamping: 0.02, // Very low damping for responsive movement
+        linearDamping: 0.1, // Increased damping for better stopping
         angularDamping: 0.95
     }));
 
@@ -214,18 +221,25 @@ const Player = forwardRef<Object3D, PlayerProps>(({
         if (tempMove.current.lengthSq() > 0) {
             tempMove.current.normalize().multiplyScalar(speed);
             
+            // Set movement velocity - let physics handle deceleration
             api.velocity.set(
                 tempMove.current.x,
                 velocityRef.current[1],
                 tempMove.current.z
             );
+            
+            // Reduce damping for responsive movement
+            api.linearDamping.set(0.02);
         } else {
-            // Stop horizontal movement when no keys are pressed
-            api.velocity.set(
-                0,
-                velocityRef.current[1],
-                0
-            );
+            // Increase damping to naturally stop horizontal movement
+            api.linearDamping.set(0.8);
+            
+            // Eliminate tiny velocity drift caused by numerical precision
+            const currentVel = velocityRef.current;
+            const threshold = 0.02; // Increased threshold
+            if (Math.abs(currentVel[0]) < threshold && Math.abs(currentVel[2]) < threshold) {
+                api.velocity.set(0, currentVel[1], 0);
+            }
         }
 
         // Update refs and global state
@@ -240,6 +254,16 @@ const Player = forwardRef<Object3D, PlayerProps>(({
             // Rotate visual mesh to follow camera direction (only Y-axis rotation)
             if (visualGroupRef.current) {
                 visualGroupRef.current.rotation.y = rotation.theta;
+            }
+            
+            // Periodic velocity cleanup to eliminate persistent drift
+            velocityCleanupCounter.current++;
+            if (velocityCleanupCounter.current % 30 === 0) { // Every 30 frames (~0.5 seconds)
+                const vel = velocityRef.current;
+                const threshold = 0.015;
+                if (Math.abs(vel[0]) < threshold && Math.abs(vel[2]) < threshold) {
+                    api.velocity.set(0, vel[1], 0);
+                }
             }
             
             // Update debug info less frequently to reduce unnecessary re-renders

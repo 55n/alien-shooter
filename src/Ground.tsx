@@ -17,7 +17,7 @@ function Ground({ size = [20, 20], thickness = 0.1, color = '#888888' }: GroundP
     return (
         <group>
             {/* Main ground platform */}
-            <mesh ref={ref} receiveShadow>
+            <mesh ref={ref} receiveShadow userData={{ interactable: false, type: 'ground' }}>
                 <boxGeometry args={[size[0], thickness, size[1]]} />
                 <meshStandardMaterial color={color} />
             </mesh>

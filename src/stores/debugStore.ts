@@ -29,6 +29,10 @@ interface DebugState {
 
     groundDistance: number;
     setGroundDistance: (distance: number) => void;
+
+    // Physics debugger
+    showPhysicsDebugger: boolean;
+    setShowPhysicsDebugger: (show: boolean) => void;
 }
 
 export const useDebugStore = create<DebugState>((set, get) => ({
@@ -59,4 +63,8 @@ export const useDebugStore = create<DebugState>((set, get) => ({
 
     groundDistance: Infinity,
     setGroundDistance: (distance) => set({ groundDistance: distance }),
+
+    // Physics debugger
+    showPhysicsDebugger: false,
+    setShowPhysicsDebugger: (show) => set({ showPhysicsDebugger: show }),
 }));
