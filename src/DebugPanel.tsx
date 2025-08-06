@@ -3,10 +3,10 @@ import { useDebugStore } from './stores/debugStore';
 import { useCameraStore } from './stores/cameraStore';
 
 function DebugPanel() {
-    const { 
-        isVisible, 
-        toggleVisibility, 
-        playerPosition, 
+    const {
+        isVisible,
+        toggleVisibility,
+        playerPosition,
         cameraDirection,
         velocity,
         isGrounded,
@@ -14,10 +14,10 @@ function DebugPanel() {
         canJump,
         groundDistance,
         showPhysicsDebugger,
-        setShowPhysicsDebugger
+        setShowPhysicsDebugger,
     } = useDebugStore();
-    
-    const { mode } = useCameraStore();
+
+    const { mode, spherical } = useCameraStore();
 
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent) => {
@@ -34,29 +34,33 @@ function DebugPanel() {
     if (!isVisible) return null;
 
     return (
-        <div style={{
-            position: 'fixed',
-            top: '10px',
-            left: '10px',
-            background: 'rgba(0, 0, 0, 0.7)',
-            color: 'white',
-            padding: '10px 15px',
-            fontFamily: 'monospace',
-            fontSize: '12px',
-            borderRadius: '4px',
-            zIndex: 1000,
-            pointerEvents: 'none',
-            minWidth: '200px',
-            border: '1px solid rgba(255, 255, 255, 0.2)'
-        }}>
-            <div style={{ 
-                marginBottom: '8px', 
-                fontWeight: 'bold',
-                color: '#00ff00'
-            }}>
+        <div
+            style={{
+                position: 'fixed',
+                top: '10px',
+                left: '10px',
+                background: 'rgba(0, 0, 0, 0.7)',
+                color: 'white',
+                padding: '10px 15px',
+                fontFamily: 'monospace',
+                fontSize: '12px',
+                borderRadius: '4px',
+                zIndex: 1000,
+                pointerEvents: 'none',
+                minWidth: '200px',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+            }}
+        >
+            <div
+                style={{
+                    marginBottom: '8px',
+                    fontWeight: 'bold',
+                    color: '#00ff00',
+                }}
+            >
                 DEBUG PANEL (F3 to toggle)
             </div>
-            
+
             <div style={{ marginBottom: '4px' }}>
                 <span style={{ color: '#ffaa00' }}>Camera Mode:</span>
             </div>
@@ -66,7 +70,17 @@ function DebugPanel() {
                 </span>
                 <div style={{ fontSize: '10px', color: '#888' }}>Press 'C' to toggle</div>
             </div>
-            
+
+            <div style={{ marginBottom: '4px' }}>
+                <span style={{ color: '#ffaa00' }}>Camera Spherical:</span>
+            </div>
+            <div style={{ marginLeft: '10px', marginBottom: '8px' }}>
+                <div>Radius: {spherical.radius.toFixed(2)}</div>
+                <div>Theta: {((spherical.theta * 180) / Math.PI).toFixed(1)}°</div>
+                <div>Phi: {((spherical.phi * 180) / Math.PI).toFixed(1)}°</div>
+                <div style={{ fontSize: '10px', color: '#888' }}>Wheel/R: zoom • Mouse: rotate</div>
+            </div>
+
             <div style={{ marginBottom: '4px' }}>
                 <span style={{ color: '#ffaa00' }}>Player Position:</span>
             </div>
@@ -114,31 +128,42 @@ function DebugPanel() {
                 <span style={{ color: '#ffaa00' }}>Status:</span>
             </div>
             <div style={{ marginLeft: '10px', marginBottom: '8px' }}>
-                <div>Grounded: <span style={{ color: isGrounded ? '#00ff00' : '#ff6666' }}>
-                    {isGrounded ? 'Yes' : 'No'}
-                </span></div>
-                <div>Can Jump: <span style={{ color: canJump ? '#00ff00' : '#ff6666' }}>
-                    {canJump ? 'Yes' : 'No'}
-                </span></div>
-                {velocity && (
-                    <div>Y-Vel: {velocity.y.toFixed(3)}</div>
-                )}
-                {playerPosition && (
-                    <div>Height: {playerPosition.y.toFixed(3)}</div>
-                )}
-                <div>Ground Dist: {groundDistance === Infinity ? 'No Ground' : groundDistance.toFixed(3)} (Max: 1.3)</div>
-                {frameRate > 0 && (
-                    <div>FPS: {frameRate.toFixed(0)}</div>
-                )}
+                <div>
+                    Grounded:{' '}
+                    <span style={{ color: isGrounded ? '#00ff00' : '#ff6666' }}>
+                        {isGrounded ? 'Yes' : 'No'}
+                    </span>
+                </div>
+                <div>
+                    Can Jump:{' '}
+                    <span style={{ color: canJump ? '#00ff00' : '#ff6666' }}>
+                        {canJump ? 'Yes' : 'No'}
+                    </span>
+                </div>
+                {velocity && <div>Y-Vel: {velocity.y.toFixed(3)}</div>}
+                {playerPosition && <div>Height: {playerPosition.y.toFixed(3)}</div>}
+                <div>
+                    Ground Dist:{' '}
+                    {groundDistance === Infinity ? 'No Ground' : groundDistance.toFixed(3)} (Max:
+                    1.3)
+                </div>
+                {frameRate > 0 && <div>FPS: {frameRate.toFixed(0)}</div>}
                 <div style={{ fontSize: '10px', color: '#888', marginTop: '4px' }}>
                     Press SPACE to jump • Ground detection: Raycast
                 </div>
-                
+
                 {/* Physics Debugger Toggle */}
                 <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #444' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', fontSize: '12px' }}>
-                        <input 
-                            type="checkbox" 
+                    <label
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            cursor: 'pointer',
+                            fontSize: '12px',
+                        }}
+                    >
+                        <input
+                            type="checkbox"
                             checked={showPhysicsDebugger}
                             onChange={(e) => setShowPhysicsDebugger(e.target.checked)}
                             style={{ marginRight: '6px' }}

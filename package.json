@@ -13,7 +13,6 @@
         "format": "prettier --write 'src/**/*.{ts,js,json,css,html}'"
     },
     "dependencies": {
-        "@react-three/cannon": "^6.6.0",
         "@react-three/drei": "^10.6.1",
         "@react-three/fiber": "^9.3.0",
         "cannon-es": "^0.20.0",

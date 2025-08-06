@@ -10,9 +10,9 @@ export default defineConfig({
                 entry: 'electron/main.ts', // ESM으로 번들됨
                 vite: {
                     build: {
-                        outDir: 'dist-electron/main'
-                    }
-                }
+                        outDir: 'dist-electron/main',
+                    },
+                },
             },
             {
                 vite: {
@@ -31,9 +31,9 @@ export default defineConfig({
                 },
             },
         ]),
-        react()
+        react(),
     ],
     resolve: {
-        alias: [{ find: "@", replacement: "/src" }],
+        alias: [{ find: '@', replacement: '/src' }],
     },
 });

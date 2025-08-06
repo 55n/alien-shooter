@@ -2,10 +2,9 @@
 {
     "extends": "./tsconfig.json",
     "compilerOptions": {
-      "module": "CommonJS",
-      "outDir": "dist-electron/preload", // 원하는 디렉토리로
-      "types": ["node"]
+        "module": "CommonJS",
+        "outDir": "dist-electron/preload", // 원하는 디렉토리로
+        "types": ["node"]
     },
     "include": ["electron/preload.ts"]
-  }
-  
+}

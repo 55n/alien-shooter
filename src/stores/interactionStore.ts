@@ -21,7 +21,7 @@ interface InteractionState {
     setObjectName: (name: string) => void;
 }
 
-export const useInteractionStore = create<InteractionState>((set, get) => ({
+export const useInteractionStore = create<InteractionState>((set, _get) => ({
     // Currently highlighted object
     highlightedObject: null,
     setHighlightedObject: (object) => set({ highlightedObject: object }),

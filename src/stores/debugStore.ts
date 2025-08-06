@@ -35,7 +35,7 @@ interface DebugState {
     setShowPhysicsDebugger: (show: boolean) => void;
 }
 
-export const useDebugStore = create<DebugState>((set, get) => ({
+export const useDebugStore = create<DebugState>((set, _get) => ({
     // Debug panel visibility
     isVisible: true,
     setIsVisible: (visible) => set({ isVisible: visible }),

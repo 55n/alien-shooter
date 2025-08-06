@@ -24,7 +24,7 @@ interface PlayerState {
     setSpeed: (speed: number) => void;
 }
 
-export const usePlayerStore = create<PlayerState>((set, get) => ({
+export const usePlayerStore = create<PlayerState>((set, _get) => ({
     // Player reference
     playerRef: null,
     setPlayerRef: (ref) => set({ playerRef: ref }),

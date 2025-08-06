@@ -1,11 +1,12 @@
 import { useFrame, useThree } from '@react-three/fiber';
 import { useRef } from 'react';
-import { Raycaster, Vector2, Vector3, Mesh, Material, MeshStandardMaterial } from 'three';
+import { Raycaster, Vector2, Mesh, Material, MeshStandardMaterial } from 'three';
 import { useInteractionStore } from './stores/interactionStore';
 
 function RaycastHighlight() {
     const { camera, scene } = useThree();
-    const { setHighlightedObject, setCanInteract, setObjectName, setObjectDistance, setIsInRange } = useInteractionStore();
+    const { setHighlightedObject, setCanInteract, setObjectName, setObjectDistance, setIsInRange } =
+        useInteractionStore();
     const raycaster = useRef(new Raycaster());
     const pointer = useRef(new Vector2(0, 0)); // Center of screen
     const previousHighlighted = useRef<Mesh | null>(null);
@@ -35,10 +36,10 @@ function RaycastHighlight() {
         // Find the first interactable mesh (excluding the player and non-interactable objects)
         for (const intersect of intersects) {
             const object = intersect.object;
-            
+
             // Skip if it's not a mesh
             if (!(object instanceof Mesh)) continue;
-            
+
             // Skip player mesh by checking for domino-like proportions
             const geometry = object.geometry;
             if (geometry && geometry.type === 'BoxGeometry') {
@@ -48,7 +49,7 @@ function RaycastHighlight() {
                     continue;
                 }
             }
-            
+
             // Check if object is marked as interactable
             const isInteractable = object.userData?.interactable !== false;
             if (!isInteractable) {
@@ -72,7 +73,7 @@ function RaycastHighlight() {
                 const highlightMaterial = new MeshStandardMaterial({
                     color: 0xffffff,
                     emissive: 0x0066ff,
-                    emissiveIntensity: 0.4
+                    emissiveIntensity: 0.4,
                 });
                 object.material = highlightMaterial;
             }
@@ -81,21 +82,21 @@ function RaycastHighlight() {
             const distance = intersect.distance;
             const maxInteractionDistance = 5.0;
             const isInRange = distance <= maxInteractionDistance;
-            
+
             // Update interaction state
             setHighlightedObject(object);
             setObjectDistance(distance);
             setIsInRange(isInRange);
             setCanInteract(true); // Always show highlight, but interaction depends on range
-            
+
             // Determine object name based on properties or position
             let objectName = 'Object';
-            
+
             // Check for custom object name first
             if (object.userData && object.userData.name) {
                 objectName = object.userData.name;
             }
-            
+
             // Check if this is an NPC by looking at the object hierarchy
             let currentObj: any = object;
             let isNPC = false;
@@ -108,7 +109,7 @@ function RaycastHighlight() {
                     break;
                 }
             }
-            
+
             // If not an NPC and no custom name, check for box types
             if (!isNPC && !object.userData?.name && geometry && geometry.type === 'BoxGeometry') {
                 const box = geometry.parameters;
