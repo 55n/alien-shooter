@@ -41,6 +41,7 @@ const Player = forwardRef<Object3D, PlayerProps>(
         const up = useRef(new Vector3(0, 1, 0));
 
         플레이어 메쉬 로딩해야 함
+        CharacterBody 적용하는거 변경 필요
 
         // Player input handling
         useEffect(() => {
