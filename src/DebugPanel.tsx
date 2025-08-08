@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useDebugStore } from './stores/debugStore';
+import { useDebugStore } from './stores/';
 import { useCameraStore } from './stores/cameraStore';
 
 function DebugPanel() {

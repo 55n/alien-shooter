@@ -3,8 +3,6 @@ import * as CANNON from 'cannon-es';
 import { forwardRef, useEffect, useRef } from 'react';
 import { Object3D, Raycaster, Vector3 } from 'three';
 import CharacterBody from './CharacterBody';
-import { useDebugStore } from './stores/debugStore';
-import { usePlayerStore } from './stores/playerStore';
 
 interface PlayerProps {
     position?: [number, number, number];
@@ -17,18 +15,6 @@ const Player = forwardRef<Object3D, PlayerProps>(
     ({ position = [0, 1, 0], radius = 0.3, height = 1.8, mass = 1 }, ref) => {
         const { camera, scene } = useThree();
 
-        // Zustand stores
-        const { keys, setKey, speed, setPlayerRef, setPosition, setIsGrounded } = usePlayerStore();
-
-        const {
-            setPlayerPosition,
-            setVelocity,
-            setIsGrounded: setDebugIsGrounded,
-            setCanJump: setDebugCanJump,
-            setGroundDistance,
-        } = useDebugStore();
-
-        // Player-specific refs
         const canJumpRef = useRef(false);
         const velocityRef = useRef<[number, number, number]>([0, 0, 0]);
         const debugUpdateCounter = useRef(0);
@@ -40,25 +26,15 @@ const Player = forwardRef<Object3D, PlayerProps>(
         const tempMove = useRef(new Vector3());
         const up = useRef(new Vector3(0, 1, 0));
 
-        플레이어 메쉬 로딩해야 함
-        CharacterBody 적용하는거 변경 필요
+        // 플레이어 메쉬 로딩해야 함
+        // CharacterBody 적용하는거 변경 필요
 
         // Player input handling
         useEffect(() => {
-            const handleKeyDown = (event: KeyboardEvent) => {
-                setKey(event.code.toLowerCase(), true);
-            };
-
-            const handleKeyUp = (event: KeyboardEvent) => {
-                setKey(event.code.toLowerCase(), false);
-            };
-
             document.addEventListener('keydown', handleKeyDown);
-            document.addEventListener('keyup', handleKeyUp);
 
             return () => {
                 document.removeEventListener('keydown', handleKeyDown);
-                document.removeEventListener('keyup', handleKeyUp);
             };
         }, [setKey]);
 

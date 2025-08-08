@@ -29,6 +29,6 @@
             // "@page/*": ["src/page/*"]
         }
     },
-    "include": ["src", "electron", "tests", "vite.config.ts"],
+    "include": ["src", "electron", "tests", "vite.config.ts", "src/stores/.ts"],
     "exclude": ["node_modules", "dist"]
 }

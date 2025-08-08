@@ -34,18 +34,6 @@ function Crosshair() {
                     boxShadow: '0 0 2px rgba(0, 0, 0, 0.8)',
                 }}
             />
-
-            {/* Center dot */}
-            <div
-                style={{
-                    position: 'absolute',
-                    width: '4px',
-                    height: '4px',
-                    backgroundColor: 'white',
-                    borderRadius: '50%',
-                    boxShadow: '0 0 2px rgba(0, 0, 0, 0.8)',
-                }}
-            />
         </div>
     );
 }
