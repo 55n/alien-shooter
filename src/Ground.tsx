@@ -1,7 +1,6 @@
+import * as Cannon from 'cannon-es';
 import { useEffect, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
-import * as CANNON from 'cannon-es';
-import * as THREE from 'three';
+import * as Three from 'three';
 import { usePhysicsWorld } from './Physics';
 
 interface GroundProps {
@@ -10,19 +9,21 @@ interface GroundProps {
     color?: string;
 }
 
-function Ground({ size = [20, 20], thickness = 0.1, color = '#888888' }: GroundProps) {
+function Ground({ size = [20, 20], thickness = 0.1, color = '#884949' }: GroundProps) {
     const world = usePhysicsWorld();
-    const meshRef = useRef<THREE.Mesh>(null);
-    const bodyRef = useRef<CANNON.Body | null>(null);
+    const meshRef = useRef<Three.Mesh>(null);
+    const bodyRef = useRef<Cannon.Body | null>(null);
 
     useEffect(() => {
         // Create physics body
-        const shape = new CANNON.Box(new CANNON.Vec3(size[0] / 2, thickness / 2, size[1] / 2));
-        const body = new CANNON.Body({
+        const shape = new Cannon.Plane();
+        const body = new Cannon.Body({
             mass: 0, // Static body
-            position: new CANNON.Vec3(0, -thickness / 2, 0),
+            position: new Cannon.Vec3(0, 0, 0),
             shape: shape,
         });
+
+        body.quaternion.setFromAxisAngle(new Cannon.Vec3(1, 0, 0), - Math.PI / 2);
 
         bodyRef.current = body;
         world.addBody(body);
@@ -34,29 +35,21 @@ function Ground({ size = [20, 20], thickness = 0.1, color = '#888888' }: GroundP
         };
     }, [world, size, thickness]);
 
-    useFrame(() => {
-        // Sync mesh position with physics body
+    useEffect(() => {
         if (meshRef.current && bodyRef.current) {
-            meshRef.current.position.copy(bodyRef.current.position as any);
-            meshRef.current.quaternion.copy(bodyRef.current.quaternion as any);
+            // meshRef.current.quaternion.setFromAxisAngle(new Three.Vector3(1, 0, 0), - Math.PI / 2);
+            meshRef.current.quaternion.copy(bodyRef.current.quaternion)
         }
     });
 
-    return (
-        <group>
-            {/* Main ground platform */}
-            <mesh ref={meshRef} receiveShadow userData={{ interactable: false, type: 'ground' }}>
-                <boxGeometry args={[size[0], thickness, size[1]]} />
-                <meshStandardMaterial color={color} />
-            </mesh>
 
-            {/* Visual border to show ground edges */}
-            <lineSegments position={[0, 0.01, 0]}>
-                <edgesGeometry args={[new THREE.BoxGeometry(size[0], 0.02, size[1])]} />
-                <lineBasicMaterial color="#ffffff" linewidth={2} />
-            </lineSegments>
-        </group>
+    return (
+        <mesh ref={meshRef}>
+            <planeGeometry args={[140, 140]} />
+            <meshStandardMaterial />
+        </mesh>
     );
+
 }
 
 export default Ground;

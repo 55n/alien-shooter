@@ -1,6 +1,6 @@
 import { useFrame } from '@react-three/fiber';
 import * as CANNON from 'cannon-es';
-import { createContext, ReactNode, useContext } from 'react';
+import React, { createContext, ReactNode, useContext, useMemo, useRef } from 'react';
 
 interface PhysicsProps {
     children: ReactNode;
@@ -19,23 +19,35 @@ export const usePhysicsWorld = () => {
     return world;
 };
 
-function Physics({ children, gravity = [0, -9.82, 0], step = 1 / 60 }: PhysicsProps) {
+const defaultGravity: [number, number, number] = [0, -9.82, 0];
+
+const Physics = React.memo(({ children, gravity = defaultGravity, step = 1 / 120 }: PhysicsProps) => {
+    const lastCallTime = useRef(0);
 
     // Create physics world
-    const world = new CANNON.World({
-        gravity: new CANNON.Vec3(...gravity),
-    });
+    const world = useMemo(() => {
+        const world = new CANNON.World({
+            gravity: new CANNON.Vec3(...gravity),
+        });
 
-    // Configure world settings
-    world.broadphase = new CANNON.NaiveBroadphase();
-    (world.solver as any).iterations = 15;
-    (world.solver as any).tolerance = 0.0001;
-    world.allowSleep = false;
+        // Configure world settings
+        world.broadphase = new CANNON.SAPBroadphase(world);
+        (world.solver as any).iterations = 10;
+        (world.solver as any).tolerance = 0.001;
+        world.allowSleep = true;
+        return world;
+    }, []);
 
 
     // Step the physics world
     useFrame((state, delta) => {
-        world.fixedStep(step, delta);
+        const time = performance.now() / 1000;
+        if (!lastCallTime.current) {
+            lastCallTime.current = time;
+        }
+        const dt = time - lastCallTime.current;
+        lastCallTime.current = time;
+        world.step(step, dt, 3);
     });
 
     return (
@@ -43,6 +55,6 @@ function Physics({ children, gravity = [0, -9.82, 0], step = 1 / 60 }: PhysicsPr
             <group>{children}</group>
         </PhysicsContext.Provider>
     );
-}
+});
 
 export default Physics;

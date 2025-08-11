@@ -1,27 +1,35 @@
 import { usePhysicsWorld } from "@/Physics";
 import { useFrame } from "@react-three/fiber";
 import * as Cannon from "cannon-es";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import * as Three from "three";
 
-interface CharacterData {
-    type: string
+interface CharacterProps {
+    name?: string;
+    bodyName?: string;
+    userData?: {
+        type: string
+    };
+    defaultPosition: Cannon.Vec3;
 }
 
-const Character = ({ userData }: { userData?: CharacterData }) => {
+const Character = (props: CharacterProps) => {
     const world = usePhysicsWorld();
     const meshRef = useRef<Three.Mesh>(null);
     const bodyRef = useRef<Cannon.Body>(null);
 
-    useEffect(() => {
-        // Body
-        const mass = 1;
+    const body = useMemo(() => {
         const body = new Cannon.Body({
-            mass: mass,
-            fixedRotation: true,
-            linearDamping: 1,
-            angularDamping: 0.8 
+            mass: 1,
+            fixedRotation: false,
+            linearDamping: 0.1,
+            angularDamping: 0.1,
+            position: props.defaultPosition,
         });
+
+        body.userData = {
+            name: props.bodyName
+        }
 
         const cylinderRadius = 0.5;
         const cylinderHeight = 1;
@@ -31,27 +39,36 @@ const Character = ({ userData }: { userData?: CharacterData }) => {
         const sphereShape = new Cannon.Sphere(sphereRadius);
 
         body.addShape(cylinderShape, new Cannon.Vec3(0, 0, 0));
-
         body.addShape(sphereShape, new Cannon.Vec3(0, cylinderHeight / 2, 0));
-
         body.addShape(sphereShape, new Cannon.Vec3(0, -cylinderHeight / 2, 0));
 
+        return body;
+    }, [props.userData]);
+
+    useEffect(() => {
         bodyRef.current = body;
         world.addBody(body);
-    }, []);
 
-    useFrame(() => {
+        return () => {
+            if (bodyRef.current) {
+                world.removeBody(bodyRef.current);
+            }
+        }
+    }, [world, body]);
+
+    useFrame((state, delta) => {
         if (meshRef.current && bodyRef.current) {
             meshRef.current.position.copy(bodyRef.current.position);
             meshRef.current.quaternion.copy(bodyRef.current.quaternion);
         }
-    }, 0);
-
+    });
 
     return (
-        <mesh ref={meshRef} userData={userData}>
-            <boxGeometry args={[]} />
-            <meshStandardMaterial color={color} />
+        <mesh ref={meshRef} userData={props.userData} name={props.name}>
+            <capsuleGeometry />
+            <meshStandardMaterial />
         </mesh>
     );
 }
+
+export default Character;

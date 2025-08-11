@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as CANNON from 'cannon-es';
+import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { usePhysicsWorld } from './Physics';
 
@@ -27,7 +27,7 @@ function Obstacle({ position, size = 2, color = '#8866ff', interactable = true }
         // Create physics body
         const shape = new CANNON.Box(new CANNON.Vec3(halfSize, halfSize, halfSize));
         const body = new CANNON.Body({
-            mass: 0, // Static body
+            mass: 1, // Static body
             position: new CANNON.Vec3(...adjustedPosition),
             shape: shape,
         });
