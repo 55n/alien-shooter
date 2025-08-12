@@ -1,11 +1,11 @@
 import { useFrame, useThree } from '@react-three/fiber';
 import { useRef } from 'react';
-import { Raycaster, Vector2, Mesh, Material, MeshStandardMaterial } from 'three';
+import { Material, Mesh, MeshStandardMaterial, Raycaster, Vector2 } from 'three';
 import { useInteractionStore } from './stores/interactionStore';
 
 function RaycastHighlight() {
     const { camera, scene } = useThree();
-    const { setHighlightedObject, setCanInteract, setObjectName, setObjectDistance, setIsInRange } =
+    const { setHighlightedObject, setObjectName } =
         useInteractionStore();
     const raycaster = useRef(new Raycaster());
     const pointer = useRef(new Vector2(0, 0)); // Center of screen
@@ -27,11 +27,8 @@ function RaycastHighlight() {
         }
 
         // Reset interaction state
-        setCanInteract(false);
         setHighlightedObject(null);
         setObjectName('');
-        setObjectDistance(Infinity);
-        setIsInRange(false);
 
         // Find the first interactable mesh (excluding the player and non-interactable objects)
         for (const intersect of intersects) {
@@ -85,9 +82,6 @@ function RaycastHighlight() {
 
             // Update interaction state
             setHighlightedObject(object);
-            setObjectDistance(distance);
-            setIsInRange(isInRange);
-            setCanInteract(true); // Always show highlight, but interaction depends on range
 
             // Determine object name based on properties or position
             let objectName = 'Object';

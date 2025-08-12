@@ -1,8 +1,8 @@
 import { useFrame } from '@react-three/fiber';
-import { useRef, useState, useEffect } from 'react';
-import { Group } from 'three';
 import * as CANNON from 'cannon-es';
-import { usePhysicsWorld } from './Physics';
+import { useEffect, useRef, useState } from 'react';
+import { Group } from 'three';
+import { usePhysicsWorld } from './physics/Physics';
 
 interface DoorProps {
     position?: [number, number, number];

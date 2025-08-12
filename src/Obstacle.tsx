@@ -2,7 +2,7 @@ import { useFrame } from '@react-three/fiber';
 import * as CANNON from 'cannon-es';
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { usePhysicsWorld } from './Physics';
+import { usePhysicsWorld } from './physics/Physics';
 
 interface ObstacleProps {
     position: [number, number, number];

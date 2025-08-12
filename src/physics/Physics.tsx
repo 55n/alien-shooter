@@ -1,5 +1,5 @@
 import { useFrame } from '@react-three/fiber';
-import * as CANNON from 'cannon-es';
+import * as Cannon from 'cannon-es';
 import React, { createContext, ReactNode, useContext, useMemo, useRef } from 'react';
 
 interface PhysicsProps {
@@ -9,7 +9,7 @@ interface PhysicsProps {
 }
 
 // Physics context to share the world instance
-const PhysicsContext = createContext<CANNON.World | null>(null);
+const PhysicsContext = createContext<Cannon.World | null>(null);
 
 export const usePhysicsWorld = () => {
     const world = useContext(PhysicsContext);
@@ -19,22 +19,24 @@ export const usePhysicsWorld = () => {
     return world;
 };
 
-const defaultGravity: [number, number, number] = [0, -9.82, 0];
+const defaultGravity: [number, number, number] = [0, -9.81, 0];
 
 const Physics = React.memo(({ children, gravity = defaultGravity, step = 1 / 120 }: PhysicsProps) => {
     const lastCallTime = useRef(0);
 
     // Create physics world
     const world = useMemo(() => {
-        const world = new CANNON.World({
-            gravity: new CANNON.Vec3(...gravity),
+        const world = new Cannon.World({
+            gravity: new Cannon.Vec3(...gravity),
         });
 
         // Configure world settings
-        world.broadphase = new CANNON.SAPBroadphase(world);
+        world.broadphase = new Cannon.SAPBroadphase(world);
         (world.solver as any).iterations = 10;
         (world.solver as any).tolerance = 0.001;
-        world.allowSleep = true;
+        // world.allowSleep = true;
+        // world.broadphase = new Cannon.NaiveBroadphase();
+
         return world;
     }, []);
 

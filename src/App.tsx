@@ -1,11 +1,15 @@
-import Character from '@/Character';
-import Ground from '@/Ground';
+import Character from '@/meshes/Character';
+import Ground from '@/meshes/Ground';
 import Obstacle from '@/Obstacle';
+import { MaterialSetup } from '@/physics/Material';
+import Physics from '@/physics/Physics';
+import { PhysicsDebugger } from '@/physics/PhysicsDebugger';
 import MainControls from '@/systems/MainControls';
+import Player from '@/systems/Player';
+import Crosshair from '@/ui/Crosshair';
 import { Canvas } from '@react-three/fiber';
 import * as Cannon from 'cannon-es';
-import Crosshair from './Crosshair';
-import Physics from './Physics';
+
 
 const App = () => {
     return (
@@ -21,9 +25,13 @@ const App = () => {
                 />
 
                 <Physics>
-                    <Ground size={[100, 100]} />
+                    <PhysicsDebugger />
+                    <MaterialSetup />
+                    <Ground size={[100, 1, 100]} />
                     <Obstacle position={[0, 2, -10]} color='#008e2f' />
-                    <Character userData={{ type: 'hero' }} name='hero' bodyName='hero' defaultPosition={new Cannon.Vec3(0, 1, 0)} />
+                    <Player>
+                        <Character userData={{ type: 'hero' }} name='hero' bodyName='hero' defaultPosition={new Cannon.Vec3(0, 1, 0)} />
+                    </Player>
                 </Physics>
                 <MainControls />
             </Canvas>

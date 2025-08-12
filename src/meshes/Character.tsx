@@ -1,4 +1,5 @@
-import { usePhysicsWorld } from "@/Physics";
+import { characterMaterial } from "@/physics/Material";
+import { usePhysicsWorld } from "@/physics/Physics";
 import { useFrame } from "@react-three/fiber";
 import * as Cannon from "cannon-es";
 import { useEffect, useMemo, useRef } from "react";
@@ -21,10 +22,11 @@ const Character = (props: CharacterProps) => {
     const body = useMemo(() => {
         const body = new Cannon.Body({
             mass: 1,
-            fixedRotation: false,
-            linearDamping: 0.1,
-            angularDamping: 0.1,
+            fixedRotation: true,
+            linearDamping: 0,
+            angularDamping: 0,
             position: props.defaultPosition,
+            material: characterMaterial,
         });
 
         body.userData = {
@@ -70,5 +72,7 @@ const Character = (props: CharacterProps) => {
         </mesh>
     );
 }
+
+
 
 export default Character;
