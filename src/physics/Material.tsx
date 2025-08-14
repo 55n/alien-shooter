@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 export const characterMaterial = new Cannon.Material('characterMaterial');
 export const groundMaterial = new Cannon.Material('groundMaterial');
 
-const playerGroundContactMaterial = new Cannon.ContactMaterial(
+export const playerGroundContactMaterial = new Cannon.ContactMaterial(
     characterMaterial,
     groundMaterial,
     {

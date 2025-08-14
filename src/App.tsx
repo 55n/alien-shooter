@@ -15,6 +15,7 @@ const App = () => {
     return (
         <div style={{ width: '100vw', height: '100vh' }}>
             <Crosshair />
+            {/* <DebugPanel /> */}
             <Canvas camera={{ fov: 75, near: 0.1, far: 1000 }} gl={{ antialias: true }} shadows>
                 <color attach="background" args={['#6ea5bf']} />
 
@@ -25,15 +26,17 @@ const App = () => {
                 />
 
                 <Physics>
-                    <PhysicsDebugger />
                     <MaterialSetup />
                     <Ground size={[100, 1, 100]} />
                     <Obstacle position={[0, 2, -10]} color='#008e2f' />
                     <Player>
                         <Character userData={{ type: 'hero' }} name='hero' bodyName='hero' defaultPosition={new Cannon.Vec3(0, 1, 0)} />
                     </Player>
+
+                    <PhysicsDebugger />
                 </Physics>
                 <MainControls />
+
             </Canvas>
         </div>
     );

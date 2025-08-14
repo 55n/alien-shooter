@@ -31,10 +31,10 @@ const Character = (props: CharacterProps) => {
 
         body.userData = {
             name: props.bodyName
-        }
+        };
 
         const cylinderRadius = 0.5;
-        const cylinderHeight = 1;
+        const cylinderHeight = props.height || 1;
         const cylinderShape = new Cannon.Cylinder(cylinderRadius, cylinderRadius, cylinderHeight, 16);
 
         const sphereRadius = 0.5;
@@ -45,7 +45,7 @@ const Character = (props: CharacterProps) => {
         body.addShape(sphereShape, new Cannon.Vec3(0, -cylinderHeight / 2, 0));
 
         return body;
-    }, [props.userData]);
+    }, [props.userData, props.height]);
 
     useEffect(() => {
         bodyRef.current = body;
@@ -67,12 +67,10 @@ const Character = (props: CharacterProps) => {
 
     return (
         <mesh ref={meshRef} userData={props.userData} name={props.name}>
-            <capsuleGeometry />
+            <capsuleGeometry args={[0.5, bodyRef.current?.aabb.upperBound.y]} />
             <meshStandardMaterial />
         </mesh>
     );
 }
-
-
 
 export default Character;
